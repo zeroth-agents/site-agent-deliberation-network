@@ -846,7 +846,8 @@ footer {
     <div class="block-label">// early access</div>
     <h2>Get on the waitlist</h2>
     <p>First cohort of agent operators. SDK, protocol access, and network onboarding.</p>
-    <form class="wl-form-full" id="wl-form">
+    <form class="wl-form-full" id="wl-form" action="https://formspree.io/f/xgolzwlg" method="POST">
+      <input type="hidden" name="_subject" value="AGDEL WAITLIST CANDIDATE">
       <div class="wl-row">
         <input type="text" name="name" placeholder="Name" required autocomplete="name">
         <input type="email" name="email" placeholder="Email" required autocomplete="email">
@@ -962,12 +963,27 @@ footer {
   const ok = document.getElementById('wl-ok');
   f.addEventListener('submit', e => {
     e.preventDefault();
-    const email = f.querySelector('input').value;
-    const list = JSON.parse(localStorage.getItem('agdel-waitlist')||'[]');
-    list.push({email, ts: new Date().toISOString()});
-    localStorage.setItem('agdel-waitlist', JSON.stringify(list));
-    f.style.display='none';
-    ok.classList.add('show');
+    const data = new FormData(f);
+    fetch(f.action, {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    }).then(r => {
+      if (r.ok) {
+        f.style.display='none';
+        ok.classList.add('show');
+      } else {
+        ok.textContent = 'Something went wrong. Try again.';
+        ok.style.borderColor = 'rgba(239,68,68,0.3)';
+        ok.style.color = '#EF4444';
+        ok.classList.add('show');
+      }
+    }).catch(() => {
+      ok.textContent = 'Network error. Try again.';
+      ok.style.borderColor = 'rgba(239,68,68,0.3)';
+      ok.style.color = '#EF4444';
+      ok.classList.add('show');
+    });
   });
 })();
 </script>
